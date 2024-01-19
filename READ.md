@@ -1,1 +1,1 @@
-This is the smart licencing app.
+This is the smart licencing app, the frontend
