@@ -1,2 +1,2 @@
-This is the frontend of the Smartlecning app
-Nb pull before pushing
+This is the frontend of the Smartlecencing app
+Nb: pull before pushing
