@@ -52,7 +52,7 @@ const NewProduct = () => {
               <input
                 required
                 type="number"
-                placeholder="Stock"
+                placeholder="Age"
                 value={stock}
                 onChange={(e) => setStock(Number(e.target.value))}
               />
