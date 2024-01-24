@@ -44,7 +44,7 @@ const img2 = "https://m.media-amazon.com/images/I/514T0SvwkHL._SL1500_.jpg";
 const arr: DataType[] = [
   {
     photo: <img src={img} alt="Shoes" />,
-    name: "Puma Shoes Air Jordan Cook Nigga 2023",
+    name: "Elton John",
     price: 690,
     stock: 3,
     action: <Link to="/admin/product/sajknaskd">Manage</Link>,
@@ -52,14 +52,14 @@ const arr: DataType[] = [
 
   {
     photo: <img src={img2} alt="Shoes" />,
-    name: "Macbook",
+    name: "George Michael",
     price: 232223,
     stock: 213,
     action: <Link to="/admin/product/sdaskdnkasjdn">Manage</Link>,
   },
   {
     photo: <img src={img} alt="Shoes" />,
-    name: "Puma Shoes Air Jordan Cook Nigga 2023",
+    name: "Billy Joel",
     price: 690,
     stock: 3,
     action: <Link to="/admin/product/sajknaskd">Manage</Link>,
@@ -67,14 +67,14 @@ const arr: DataType[] = [
 
   {
     photo: <img src={img2} alt="Shoes" />,
-    name: "Macbook",
+    name: "Kool and The Gang",
     price: 232223,
     stock: 213,
     action: <Link to="/admin/product/sdaskdnkasjdn">Manage</Link>,
   },
   {
     photo: <img src={img} alt="Shoes" />,
-    name: "Puma Shoes Air Jordan Cook Nigga 2023",
+    name: "Kenny G",
     price: 690,
     stock: 3,
     action: <Link to="/admin/product/sajknaskd">Manage</Link>,
@@ -82,14 +82,14 @@ const arr: DataType[] = [
 
   {
     photo: <img src={img2} alt="Shoes" />,
-    name: "Macbook",
+    name: "Carlos Santana",
     price: 232223,
     stock: 213,
     action: <Link to="/admin/product/sdaskdnkasjdn">Manage</Link>,
   },
   {
     photo: <img src={img2} alt="Shoes" />,
-    name: "Macbook",
+    name: "Andrew Ridgeley",
     price: 232223,
     stock: 213,
     action: <Link to="/admin/product/sdaskdnkasjdn">Manage</Link>,
