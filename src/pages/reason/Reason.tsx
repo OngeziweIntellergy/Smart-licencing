@@ -3,27 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import './Reason.css';
 
-function Reason() {
+interface ReasonProps {
+}
+
+const Reason: React.FC<ReasonProps> = () => {
     const navigate = useNavigate();
     
-    const options = [
+    const options: string[] = [
         'Professional Driving Permit',
         'Driver Renewal Licence',
         'Motor Vehicle License',
         'Operating Licence'
     ];
-    const [selectedOption, setSelectedOption] = useState('');
+    const [selectedOption, setSelectedOption] = useState<string>('');
 
-    const generatePayload = (option) => {
-        const randomNumber = Math.floor(100 + Math.random() * 900);
+    const generatePayload = (option: string): string => {
+        const randomNumber: number = Math.floor(100 + Math.random() * 900);
         return `${option.charAt(0)}${randomNumber}`;
     };
 
-    const storeInLocalDatabase = (data) => {
+    const storeInLocalDatabase = (data: any): void => {
         localStorage.setItem('requestDetails', JSON.stringify(data));
     };
 
-    const sendRequest = async (payload) => {
+    const sendRequest = async (payload: any): Promise<void> => {
          
         try {
             Swal.fire({
@@ -58,7 +61,7 @@ function Reason() {
                     showConfirmButton: false,
                     timer: 1500
                 });
-                navigate('/ticket');
+                navigate('/ticket/ticket');
             }
             console.log('Response:', data);
         } catch (error) {
@@ -73,7 +76,7 @@ function Reason() {
         }
     };
 
-    const handleSelect = (option) => {
+    const handleSelect = (option: string): void => {
  
         setSelectedOption(option);
        
@@ -81,16 +84,9 @@ function Reason() {
         sendRequest({
             "option":option,
             "state": "in Queue",
-            
-
-
           }); 
-  
-        
     };
     
-
-
     return (
         <div className='container-grid'>
             <div className="header">
@@ -99,7 +95,7 @@ function Reason() {
             </div>
             <p>Choose from the below options:</p>
             <div className="grid-container">
-                {options.map((option, index) => (
+                {options.map((option: string, index: number) => (
                     <div
                         key={index}
                         className={`grid-item ${selectedOption === option ? 'selected' : ''}`}
@@ -114,5 +110,3 @@ function Reason() {
 }
 
 export default Reason;
-
-

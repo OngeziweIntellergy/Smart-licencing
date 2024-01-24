@@ -1,7 +1,7 @@
-// NotFound.js
-import React from 'react';
+// NotFound.tsx
+import React, { FC } from 'react';
 
-function NotFound() {
+const NotFound: FC = () => {
   return (
     <div>
       <h2>Page Not Found</h2>

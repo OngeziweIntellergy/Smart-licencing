@@ -3,35 +3,41 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from "react-router-dom";
-import { resetUserSession } from '../../service/AuthService';
+import { resetUserSession } from '../../service/authService';
 import "./Agent.css";
 
+interface Ticket {
+    state: string;
+    ticketNumber: number;
+    datetime: string;
+    user: string;
+    ticket_number: number;
+}
 
 function Agent() {
     const navigate = useNavigate();
-    const [tickets, setTickets] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [servedCount, setServedCount] = useState(0);
-    const [doneCount, setDoneCount] = useState(0);
-    const handleLogout=()=>{
+    const [tickets, setTickets] = useState<Ticket[]>([]);
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [servedCount, setServedCount] = useState<number>(0);
+    const [doneCount, setDoneCount] = useState<number>(0);
+    const handleLogout = (): void => {
         resetUserSession();
-        showLoading()
-        navigate('/login')
-
+        showLoading();
+        navigate('/login');
     }
 
     // Text-to-Speech Function with Female Voice
-    const speakText = (text) => {
+    const speakText = (text: string): void => {
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.rate = 1.2; // Adjust the rate as needed
-    
-            const chooseVoice = () => {
+
+            const chooseVoice = (): void => {
                 let voices = window.speechSynthesis.getVoices();
-                
+
                 // Filter for female voices
                 let femaleVoices = voices.filter(voice => voice.name.toLowerCase().includes("female"));
-    
+
                 if (femaleVoices.length > 0) {
                     // Choose the first available female voice
                     utterance.voice = femaleVoices[0];
@@ -40,7 +46,7 @@ function Agent() {
                     console.warn("No female voice available. Speech synthesis not performed.");
                 }
             };
-    
+
             if (window.speechSynthesis.getVoices().length > 0) {
                 chooseVoice();
             } else {
@@ -52,21 +58,21 @@ function Agent() {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchData = async (): Promise<void> => {
             try {
                 const response = await axios.post('https://bbkzcze7c3.execute-api.us-east-1.amazonaws.com/Dev/list_tickets');
-                let data = response.data;
+                let data: Ticket[] = response.data;
                 data = data.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
 
                 console.log(data);
-                
+
                 const processedTickets = data.map(ticket => ({
                     ...ticket,
-                    state: ticket.state,  
+                    state: ticket.state,
                     ticketNumber: ticket.ticket_number,
                 }));
                 setTickets(processedTickets);
-               
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -79,37 +85,37 @@ function Agent() {
         updateCounters();
     }, [tickets]);
 
-    const updateCounters = () => {
+    const updateCounters = (): void => {
         setServedCount(tickets.filter(ticket => ticket.state === 'Serving').length);
         setDoneCount(tickets.filter(ticket => ticket.state === 'Done').length);
     };
 
-    const handleSearchChange = (event) => {
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         setSearchQuery(event.target.value);
     };
-    const showLoading = function() {
+    const showLoading = function (): void {
         Swal.fire({
-          title: 'Now loading',
-          allowEscapeKey: false,
-          allowOutsideClick: false,
-          timer: 2000,
-          didOpen: () => {
-            Swal.showLoading();
-          }
+            title: 'Now loading',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            timer: 2000,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         }).then((result) => {
-          if (result.dismiss === Swal.DismissReason.timer) {
-            console.log('closed by timer!!!!');
-            Swal.fire({ 
-              title: 'Finished!',
-              icon: 'success',
-              timer: 2000,
-              showConfirmButton: false
-            });
-          }
+            if (result.dismiss === Swal.DismissReason.timer) {
+                console.log('closed by timer!!!!');
+                Swal.fire({
+                    title: 'Finished!',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
         });
-      };
+    };
 
-    const handleTicketSelect = (ticket) => {
+    const handleTicketSelect = (ticket: Ticket): void => {
         Swal.fire({
             title: `Ticket NO ${ticket.ticketNumber}`,
             html: `<strong>Status:</strong> ${ticket.state}<br/><strong>Description:</strong> ${ticket.user}`,
@@ -118,25 +124,23 @@ function Agent() {
         });
     };
 
-   
-
-    const handleAction = async (ticketNumber, action) => {
+    const handleAction = async (ticketNumber: number, action: string): Promise<void> => {
         let updatedTickets = [...tickets];
-    
+
         if (action === 'Serving') {
             const currentlyServingTicket = updatedTickets.find(ticket => ticket.state === 'Serving');
-    
+
             if (currentlyServingTicket) {
-                updatedTickets = updatedTickets.map(ticket => 
+                updatedTickets = updatedTickets.map(ticket =>
                     ticket.state === 'Serving' ? { ...ticket, state: 'Done' } : ticket
                 );
                 await updateTicketState('Done', currentlyServingTicket.ticket_number);
             }
-    
+
             updatedTickets = updatedTickets.map(ticket =>
                 ticket.ticket_number === ticketNumber ? { ...ticket, state: 'Serving' } : ticket
             );
-    
+
             const ticketBeingServed = updatedTickets.find(ticket => ticket.ticket_number === ticketNumber);
             if (ticketBeingServed) {
                 speakText(`Ticket number ${ticketNumber} at station number 1.`);
@@ -152,17 +156,17 @@ function Agent() {
 
         setTickets(updatedTickets);
         updateCounters();
-        await updateTicketState(action, ticketNumber );
+        await updateTicketState(action, ticketNumber);
     };
 
-    const updateTicketState = async (newState, ticketNumber) => {
+    const updateTicketState = async (newState: string, ticketNumber: number): Promise<void> => {
         console.log('Updating ticket state:', newState, 'Ticket number:', ticketNumber);
-    
+
         try {
             const response = await axios.put(`https://u9qok0btf1.execute-api.us-east-1.amazonaws.com/Dev/ticket`, {
                 ticket_number: ticketNumber,
                 state: newState
-                
+
             });
             console.log('Update response:', response);
         } catch (error) {
@@ -170,7 +174,7 @@ function Agent() {
         }
     };
 
-    const handleReview = (ticketNumber) => {
+    const handleReview = (ticketNumber: number): void => {
         Swal.fire({
             title: 'Review Ticket',
             text: `Review for Ticket NO ${ticketNumber}`,

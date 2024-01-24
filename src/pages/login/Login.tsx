@@ -5,20 +5,26 @@ import './Login.css';
 import {useNavigate} from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-
+interface Reason {
+  Professional_Driving_Permit: boolean;
+  Diver_Renewal_License: boolean;
+  Motor_Vehicle_License: boolean;
+  Operating_License: boolean;
+  checkAll: boolean;
+}
 
 function Login() {
   const navigate = useNavigate();
-  const [password, setPassword]= useState('');
-  const [email, setEmail]= useState('');
-  const [reason, setReason] = useState({
+  const [password, setPassword]= useState<string>('');
+  const [email, setEmail]= useState<string>('');
+  const [reason, setReason] = useState<Reason>({
     Professional_Driving_Permit: false,
     Diver_Renewal_License: false,
     Motor_Vehicle_License: false,
     Operating_License: false,
     checkAll: false,
   })
-  const updateCheckboxes = (checked) => {
+  const updateCheckboxes = (checked: boolean) => {
     document.getElementById('Professional_Driving_Permit').checked = checked;
     document.getElementById('Diver_Renewal_License').checked = checked;
     document.getElementById('Motor_Vehicle_License').checked = checked;
@@ -45,7 +51,7 @@ function Login() {
       }
     });
   };
-  const submitHandler =(e)=>{
+  const submitHandler =(e: React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault();
     let loginUrl = "https://hps0z6b4xb.execute-api.us-east-1.amazonaws.com/prod/login";
     const requestConfig = {

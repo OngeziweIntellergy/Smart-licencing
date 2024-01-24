@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRowId } from '@mui/x-data-grid';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import './user.css';
 
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  UserRole: string;
+  station: string;
+}
+
 export default function User() {
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState<User[]>([]);
 
   const fetchUserList = async () => {
     try {
@@ -16,7 +24,7 @@ export default function User() {
 
       if (statusCode === 200) {
         const jsonObject = JSON.parse(body);
-        const transformedRows = jsonObject.map((item, index) => ({
+        const transformedRows = jsonObject.map((item: User, index: number) => ({
           id: index + 1,
           ...item,
         }));
@@ -51,11 +59,11 @@ export default function User() {
       focusConfirm: false,
       preConfirm: () => {
         const user = {
-          username: document.getElementById('username').value,
-          email: document.getElementById('email').value,
-          password: document.getElementById('password').value,
-          station: document.getElementById('station').value,
-          UserRole: document.getElementById('UserRole').value
+          username: (document.getElementById('username') as HTMLInputElement).value,
+          email: (document.getElementById('email') as HTMLInputElement).value,
+          password: (document.getElementById('password') as HTMLInputElement).value,
+          station: (document.getElementById('station') as HTMLInputElement).value,
+          UserRole: (document.getElementById('UserRole') as HTMLInputElement).value,
         };
         return user;
       },
@@ -65,16 +73,24 @@ export default function User() {
       try {
         const apiEndpoint = 'https://op0unjbx79.execute-api.us-east-1.amazonaws.com/Dev/register';
         const response = await axios.post(apiEndpoint, formValues);
-        
+
         if (response.status === 200) {
           Swal.fire('Success', 'User added successfully', 'success');
           fetchUserList();
         } else {
-          Swal.fire('Oops...', `User could not be added. Status code: ${response.status}`, 'error');
+          Swal.fire(
+            'Oops...',
+            `User could not be added. Status code: ${response.status}`,
+            'error'
+          );
         }
       } catch (error) {
         if (error.response) {
-          Swal.fire('Error', `Server responded with status code: ${error.response.status}`, 'error');
+          Swal.fire(
+            'Error',
+            `Server responded with status code: ${error.response.status}`,
+            'error'
+          );
         } else if (error.request) {
           Swal.fire('Error', 'No response received from the server', 'error');
         } else {
@@ -85,57 +101,52 @@ export default function User() {
     }
   };
 
-  // ...
+  const handleDeleteUser = async (userId: GridRowId) => {
+    const result = await Swal.fire({
+      title: 'Delete User',
+      text: 'Are you sure you want to delete this user?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+    });
 
-const handleDeleteUser = async (userId) => {
-  const result = await Swal.fire({
-    title: 'Delete User',
-    text: 'Are you sure you want to delete this user?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Yes, delete it!',
-  });
+    if (result.isConfirmed) {
+      try {
+        // Assuming the id in your rows state matches the user_id in DynamoDB
+        const userToDelete = rows.find((row) => row.id === userId);
 
-  if (result.isConfirmed) {
-    try {
-      // Assuming the id in your rows state matches the user_id in DynamoDB
-      const userToDelete = rows.find((row) => row.id === userId);
-
-      // Make sure we have a valid user ID to delete
-      if (!userToDelete || !userToDelete.user_id) {
-        throw new Error('User ID to delete is invalid or missing');
-      }
-
-      const response = await axios.delete(
-        'https://fdau2rqk41.execute-api.us-east-1.amazonaws.com/Prod/delete',
-        {
-          data: {
-            user_id: userToDelete.user_id,
-          },
+        // Make sure we have a valid user ID to delete
+        if (!userToDelete || !userToDelete.user_id) {
+          throw new Error('User ID to delete is invalid or missing');
         }
-      );
 
-      if (response.status === 200) {
-        // Create a new array without the deleted user
-        const updatedRows = rows.filter((row) => row.user_id !== userToDelete.user_id);
-        // Update the state with the new array to re-render the component
-        setRows(updatedRows);
-        Swal.fire('Deleted!', 'The user has been deleted.', 'success');
-      } else {
-        Swal.fire('Error', 'Could not delete user', 'error');
+        const response = await axios.delete(
+          'https://fdau2rqk41.execute-api.us-east-1.amazonaws.com/Prod/delete',
+          {
+            data: {
+              user_id: userToDelete.user_id,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          // Create a new array without the deleted user
+          const updatedRows = rows.filter((row) => row.user_id !== userToDelete.user_id);
+          // Update the state with the new array to re-render the component
+          setRows(updatedRows);
+          Swal.fire('Deleted!', 'The user has been deleted.', 'success');
+        } else {
+          Swal.fire('Error', 'Could not delete user', 'error');
+        }
+      } catch (error) {
+        Swal.fire('Error', 'Request failed: ' + error.message, 'error');
       }
-    } catch (error) {
-      Swal.fire('Error', 'Request failed: ' + error.message, 'error');
     }
-  }
-};
+  };
 
-// ...
-
-
-  const columns = [
+  const columns: GridColDef[] = [
     { field: 'id', headerName: 'Number', width: 250 },
     { field: 'username', headerName: 'Username', width: 250 },
     { field: 'email', headerName: 'Email', width: 250 },
@@ -156,7 +167,14 @@ const handleDeleteUser = async (userId) => {
 
   return (
     <div className="data-grid-container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', marginRight: '30px' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginBottom: '10px',
+          marginRight: '30px',
+        }}
+      >
         {/* Logoff Button */}
         <button onClick={handleLogoff} className="Signout-button">
           Signout

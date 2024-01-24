@@ -3,35 +3,31 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import './Ticket.css';
 
-const Ticket = () => {
-  const [ticketNumber, setTicketNumber] = useState('');
-  const [reason, setReason] = useState('');
-  const [numberInQueue, setNumberInQueue] = useState(0);
-  const [estimatedServiceTime, setEstimatedServiceTime] = useState('');
-  const [staticEstimatedTime, setStaticEstimatedTime] = useState('');
+const Ticket: React.FC = () => {
+  const [ticketNumber, setTicketNumber] = useState<string>('');
+  const [reason, setReason] = useState<string>('');
+  const [numberInQueue, setNumberInQueue] = useState<number>(0);
+  const [estimatedServiceTime, setEstimatedServiceTime] = useState<string>('');
+  const [staticEstimatedTime, setStaticEstimatedTime] = useState<string>('');
 
-  const [serviceTime, setServiceTime] = useState(0);
-  const [timer, setTimer] = useState(null);
+  const [serviceTime, setServiceTime] = useState<number>(0);
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 
-  const [ticketId, setTicketId] = useState('');
+  const [ticketId, setTicketId] = useState<string>('');
 
-
-
-const calculateNumberInQueue = useCallback(async (dateTime, option) => {
-  try {
-    const response = await axios.post('https://bbkzcze7c3.execute-api.us-east-1.amazonaws.com/Dev/list_tickets');
-    const tickets = response.data;
-    const numberBefore = countTicketsBefore(tickets, dateTime, option);
-    const foundTicketId = findTicketId(tickets, dateTime, option);
-    setNumberInQueue(numberBefore);
-    setTicketId(foundTicketId);
-    calculateEstimatedServiceTime(numberBefore);
-  } catch (error) {
-    Swal.fire("Error", "Error fetching tickets: " + error.message, "error");
-  }
-}, []);
-
-  
+  const calculateNumberInQueue = useCallback(async (dateTime: string, option: string) => {
+    try {
+      const response = await axios.post('https://bbkzcze7c3.execute-api.us-east-1.amazonaws.com/Dev/list_tickets');
+      const tickets: any[] = response.data;
+      const numberBefore: number = countTicketsBefore(tickets, dateTime, option);
+      const foundTicketId: string | null = findTicketId(tickets, dateTime, option);
+      setNumberInQueue(numberBefore);
+      setTicketId(foundTicketId);
+      calculateEstimatedServiceTime(numberBefore);
+    } catch (error) {
+      Swal.fire("Error", "Error fetching tickets: " + error.message, "error");
+    }
+  }, []);
 
   useEffect(() => {
     const updateQueue = async () => {
@@ -45,21 +41,19 @@ const calculateNumberInQueue = useCallback(async (dateTime, option) => {
       }
     };
     updateQueue();
-    
+
     const intervalId = setInterval(updateQueue, 10000); // Update queue every 10 seconds
     return () => clearInterval(intervalId);
   }, [calculateNumberInQueue]);
-
- 
 
   const startServiceTimer = useCallback(() => {
     setTimer(setInterval(() => {
       setServiceTime(time => time + 1);
     }, 1000));
   }, []);
-  
+
   const stopServiceTimer = useCallback(() => {
-    clearInterval(timer);
+    clearInterval(timer!);
     setTimer(null);
     Swal.fire({
       title: 'Rate Our Service',
@@ -80,6 +74,7 @@ const calculateNumberInQueue = useCallback(async (dateTime, option) => {
       }
     });
   }, [timer, serviceTime]);
+
   useEffect(() => {
     if (numberInQueue === 1 && !timer) {
       startServiceTimer();
@@ -105,9 +100,8 @@ const calculateNumberInQueue = useCallback(async (dateTime, option) => {
       stopServiceTimer();
     }
   }, [numberInQueue, timer, startServiceTimer, stopServiceTimer]);
-  
- 
-  const updateTicketWithTimeAndRating = async (time, rating) => {
+
+  const updateTicketWithTimeAndRating = async (time: number, rating: number) => {
     try {
       await axios.put(`https://u9qok0btf1.execute-api.us-east-1.amazonaws.com/Dev/ticket`, {
         serviceTime: time,
@@ -118,10 +112,10 @@ const calculateNumberInQueue = useCallback(async (dateTime, option) => {
     }
   };
 
-  const findTicketId = (tickets, dateTime, option) => {
+  const findTicketId = (tickets: any[], dateTime: string, option: string): string | null => {
     try {
-      const ticket = tickets.find(ticket => 
-        new Date(ticket.datetime).toISOString() === dateTime && 
+      const ticket = tickets.find(ticket =>
+        new Date(ticket.datetime).toISOString() === dateTime &&
         ticket.option === option
       );
       return ticket ? ticket.ticket_number : null;
@@ -130,35 +124,33 @@ const calculateNumberInQueue = useCallback(async (dateTime, option) => {
       return null;
     }
   };
-  
-  const countTicketsBefore = (tickets, currentTicketDateTime, option) => {
+
+  const countTicketsBefore = (tickets: any[], currentTicketDateTime: string, option: string): number => {
     try {
-      const count = tickets.filter(ticket => 
+      const count = tickets.filter(ticket =>
         new Date(ticket.datetime) < new Date(currentTicketDateTime) &&
         ticket.option === option &&
         ticket.state === 'in Queue'
       ).length;
-  
+
       return count + 1;
     } catch (error) {
       console.error("Error counting tickets:", error);
       return 0;
     }
   };
-  
 
-  const calculateEstimatedServiceTime = (numberBefore) => {
+  const calculateEstimatedServiceTime = (numberBefore: number) => {
     if (staticEstimatedTime === '') {
       const averageWaitTimePerPerson = 15;
       const totalWaitTime = numberBefore * averageWaitTimePerPerson;
       const currentTime = new Date();
-      currentTime.setMinutes(currentTime.getMinutes() + totalWaitTime); 
+      currentTime.setMinutes(currentTime.getMinutes() + totalWaitTime);
       const newEstimatedTime = currentTime.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit', hour24: true });
       setEstimatedServiceTime(newEstimatedTime);
       setStaticEstimatedTime(newEstimatedTime);
     }
   };
-  
 
   const queueMessage = () => {
     if (numberInQueue === 1) {
@@ -168,7 +160,7 @@ const calculateNumberInQueue = useCallback(async (dateTime, option) => {
       console.log(numberInQueue)
 
       return "Move closer, you're second in line!";
-    } else if(numberInQueue === 0){
+    } else if (numberInQueue === 0) {
       console.log(numberInQueue)
       return "---";
     } else {
@@ -181,7 +173,7 @@ const calculateNumberInQueue = useCallback(async (dateTime, option) => {
       <div className="header">
         <img src="https://dltccoffeeimages.s3.amazonaws.com/new_logo_dltc.png" alt="Logo" className="logo" />
         <h1 className="welcome-text">Welcome to SMART LICENSING</h1>
-        
+
       </div>
       <div className="ticket-info">
         <div className="ticket-number-container">
