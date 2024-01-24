@@ -26,7 +26,7 @@ const NewProduct = () => {
       <main className="product-management">
         <article>
           <form>
-            <h2>New Product</h2>
+            <h2>New User</h2>
             <div>
               <label>Name</label>
               <input
@@ -38,21 +38,21 @@ const NewProduct = () => {
               />
             </div>
             <div>
-              <label>Price</label>
+              <label>Surname</label>
               <input
                 required
                 type="number"
-                placeholder="Price"
+                placeholder="Surname"
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
               />
             </div>
             <div>
-              <label>Stock</label>
+              <label>Email Address</label>
               <input
                 required
                 type="number"
-                placeholder="Age"
+                placeholder="Email Address"
                 value={stock}
                 onChange={(e) => setStock(Number(e.target.value))}
               />

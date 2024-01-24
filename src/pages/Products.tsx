@@ -23,16 +23,16 @@ const columns: Column<DataType>[] = [
     accessor: "name",
   },
   {
-    Header: "Price",
-    accessor: "price",
+    Header: "Email",
+    accessor: "email",
   },
   {
-    Header: "Stock",
-    accessor: "stock",
+    Header: "Contact Number",
+    accessor: "contact number",
   },
   {
-    Header: "Action",
-    accessor: "action",
+    Header: "Active",
+    accessor: "active",
   },
 ];
 
@@ -104,7 +104,7 @@ const Products = () => {
       columns,
       data,
       "dashboard-product-box",
-      "Products",
+      "Users",
       true
     ),
     []
