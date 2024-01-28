@@ -18,7 +18,8 @@
     "react-icons": "^4.10.1",
     "react-router-dom": "^6.21.3",
     "react-table": "^7.8.0",
-    "sass": "^1.66.1"
+    "sass": "^1.66.1",
+    "sweetalert2": "^11.10.4"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
