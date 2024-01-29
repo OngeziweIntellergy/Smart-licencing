@@ -1,6 +1,6 @@
 // import { useState, useEffect } from 'react';
 
-type User = any; 
+type User = any; // Define your User type here
 type Token = string;
 
 const useSessionStorage = () => {

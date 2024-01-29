@@ -97,7 +97,7 @@
           top: -1.5rem;
         }
 
-        > input {
+        > input, select {
           @include inputStyle(
             100%,
             1rem,
@@ -163,3 +163,4 @@
     margin-left: auto;
   }
 }
+.checkBox{display: flex; flex-direction: column; justify-content: center;}

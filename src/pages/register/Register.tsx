@@ -141,6 +141,7 @@ function Register() {
             onChange={handleChange}
           />
         </label>
+        
         <input type="submit" value="submit" />
       </form>
     </div>

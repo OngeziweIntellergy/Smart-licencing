@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
-import { setUserSession } from '../../service/AuthService';
+import  useSessionStorage  from '../../service/AuthService';
 import axios from 'axios';
 import './Login.css'; 
 import {useNavigate} from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-// interface Reason {
-//   Professional_Driving_Permit: boolean;
-//   Diver_Renewal_License: boolean;
-//   Motor_Vehicle_License: boolean;
-//   Operating_License: boolean;
-//   checkAll: boolean;
-// }
+
 
 function Login() {
   const navigate = useNavigate();
+  const { setUserSession } = useSessionStorage();
+
   const [password, setPassword]= useState<string>('');
   const [email, setEmail]= useState<string>('');
   // const [reason, setReason] = useState<Reason>({
@@ -71,7 +67,7 @@ function Login() {
         const userRole = response.data.user.user;
         if (userRole === 'admin') {
           setUserSession(response.data.user, response.data.token);
-          showOptions();
+          // showOptions();
         } else if (userRole === 'Sadmin') {
           setUserSession(response.data.user, response.data.token);
 
